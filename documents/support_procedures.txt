@@ -1,0 +1,26 @@
+# Support Procedures
+
+## Tier‑1 Support
+- Initial triage: gather user details, issue description, screenshot if possible.
+- Use knowledge base search; if a known fix exists, guide the user.
+- If not resolved, create an incident ticket and assign to Tier‑2.
+
+## Tier‑2 Support
+- Perform deeper diagnostics (run MCP tools, check logs).
+- Escalate to Tier‑3 or specialist teams if needed.
+- Update ticket with steps taken and resolution.
+
+## SLA Targets
+- **Critical**: initial response <15 min, resolution <2 h.
+- **High**: response <30 min, resolution <4 h.
+- **Medium/Low**: response <1 h, resolution within 1 day.
+
+## Category
+Support
+
+## Metadata
+- Document ID: supp-001
+- Title: Support Procedures Guide
+- Category: support
+- Author: IT Operations
+- Version: 1.0

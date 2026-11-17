@@ -1,0 +1,32 @@
+# IT Security Policy
+
+## Overview
+This document outlines the security expectations for all employees and contractors.
+
+## Acceptable Use
+- Only authorized devices may access corporate resources.
+- No sharing of credentials.
+- All laptops must have disk‑encryption enabled.
+
+## Password & MFA
+- Minimum length 12, complexity requirements.
+- MFA required for all privileged accounts.
+
+## Data Protection
+- Classify data as Public, Internal, Confidential, Restricted.
+- Encrypt data at rest and in transit.
+- Quarterly security awareness training.
+
+## Incident Reporting
+- Report any suspicious activity to the Security Operations Center within 1 hour.
+- Use the incident ticketing system via MCP `create_ticket`.
+
+## Category
+Security
+
+## Metadata
+- Document ID: sec-001
+- Title: IT Security Policy
+- Category: security
+- Author: IT Security
+- Version: 1.0

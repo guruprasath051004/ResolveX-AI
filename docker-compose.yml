@@ -1,0 +1,81 @@
+services:
+  # ── PostgreSQL 16 ──
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Set_POSTGRES_USER_in_.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set_POSTGRES_PASSWORD_in_.env}
+      POSTGRES_DB: ${POSTGRES_DB:?Set_POSTGRES_DB_in_.env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:?Set_POSTGRES_USER_in_.env}", "-d", "${POSTGRES_DB:?Set_POSTGRES_DB_in_.env}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── ChromaDB (vector store) ──
+  chroma:
+    image: chromadb/chroma:latest
+    ports:
+      - "8100:8000"
+    volumes:
+      - chromadata:/chroma/chroma
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── MCP Server (streamable HTTP) ──
+  mcp-server:
+    build:
+      context: .
+      dockerfile: backend/mcp_server/Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: "postgresql+psycopg2://${POSTGRES_USER:?Set_POSTGRES_USER_in_.env}:${POSTGRES_PASSWORD:?Set_POSTGRES_PASSWORD_in_.env}@postgres:5432/${POSTGRES_DB:?Set_POSTGRES_DB_in_.env}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Backend (FastAPI) ──
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "postgresql+psycopg2://${POSTGRES_USER:?Set_POSTGRES_USER_in_.env}:${POSTGRES_PASSWORD:?Set_POSTGRES_PASSWORD_in_.env}@postgres:5432/${POSTGRES_DB:?Set_POSTGRES_DB_in_.env}"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Set_JWT_SECRET_KEY_in_.env}
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      DEMO_EMPLOYEE_PASSWORD: ${DEMO_EMPLOYEE_PASSWORD:?Set_DEMO_EMPLOYEE_PASSWORD_in_.env}
+      DEMO_SUPPORT_PASSWORD: ${DEMO_SUPPORT_PASSWORD:?Set_DEMO_SUPPORT_PASSWORD_in_.env}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:?Set_DEMO_ADMIN_PASSWORD_in_.env}
+      LLM_PROVIDER: demo
+      MCP_SERVER_URL: http://mcp-server:8001
+      CHROMA_PERSIST_DIR: /app/chroma_data
+    command: ["sh", "-c", "alembic upgrade head && uvicorn backend.main:app --host 0.0.0.0 --port 8000"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mcp-server:
+        condition: service_started
+
+  # ── Frontend (React + Nginx) ──
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  chromadata:

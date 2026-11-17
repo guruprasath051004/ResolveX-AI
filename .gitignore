@@ -1,0 +1,41 @@
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Python environments and cache
+.venv/
+.venv311/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Local databases and vector storage
+*.db
+*.sqlite
+*.sqlite3
+chroma_data/
+**/chroma_data/
+
+# Build and test output
+dist/
+build/
+coverage/
+
+# Logs and temporary backups
+*.log
+*.backup
+*.corrupted-backup.tsx
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
